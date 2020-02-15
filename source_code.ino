@@ -31,6 +31,10 @@
 #define baud_rate 9600
 
 void setup(){
+    //Set pins as inputs
+    pinMode(left_sensor_pin, INPUT);
+    pinMode(right_sensor_pin,INPUT);
+    
     //Set pins as outputs
     pinMode(motor_pin_1, OUTPUT);
     pinMode(motor_pin_2, OUTPUT);
