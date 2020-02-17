@@ -16,6 +16,9 @@
 
 //Note for Prajna: to upload the code to arduino, write this permission in terminal $sudo chmod a+rw /dev/ttyUSB0
 
+#include <SoftwareSerial.h>
+SoftwareSerial HC05(0,1);
+
 //Motor A (right)
 #define motor_pin_1 5  // Pin 14 of L293
 #define motor_pin_2 6  // Pin 10 of L293
@@ -40,7 +43,8 @@ void setup(){
     pinMode(motor_pin_2, OUTPUT);
     pinMode(motor_pin_3, OUTPUT);
     pinMode(motor_pin_4, OUTPUT);
-    Serial.begin(baud_rate);
+
+    HC05.begin(baud_rate);
 }
 
 void motorAClockwise(int speed){
@@ -116,13 +120,13 @@ void lineFollower(){
     int left_sensor=analogRead(left_sensor_pin);
     int right_sensor=analogRead(right_sensor_pin);
     if (!isBlack(left_sensor) && !isBlack(right_sensor)){
-        forward(180);
+        forward(255);
     }
     else if (isBlack(left_sensor) && !isBlack(right_sensor)){
-        turnLeft(100);
+        turnLeft(255);
     }
     else if (!isBlack(left_sensor) && isBlack(right_sensor)){
-        turnRight(100);
+        turnRight(255);
     }
     else{
         stop();
@@ -175,8 +179,10 @@ void sumo(char command){
             case 'q':
                 speed_now=255;
                 break;
-            default:
+            case 'S':
                 stop();
+           
+                break;
         }
     }
 }
@@ -186,9 +192,7 @@ bool is_X = 0;
 void play(){
     //if you use the robot as sumo robot, call sumo(char $command)
     //if you use the robot as line follower robot, call lineFollower()
-    if (Serial.available()){
-        tmp = Serial.read();
-    }
+    tmp = HC05.read();
     if (tmp=='x'){
         is_X=0;
     }
