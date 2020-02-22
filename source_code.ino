@@ -26,10 +26,18 @@ SoftwareSerial HC05(0,1);
 #define motor_pin_3 10 // Pin  7 of L293
 #define motor_pin_4 9  // Pin  2 of L293
 
+//photosensor IR
+#define left_sensor_pin A0
+#define right_sensor_pin A1
+
 //baud_rate
-#define baud_rate 38400
+#define baud_rate 9600
 
 void setup(){
+    //Set pins as inputs
+    pinMode(left_sensor_pin, INPUT);
+    pinMode(right_sensor_pin,INPUT);
+    
     //Set pins as outputs
     pinMode(motor_pin_1, OUTPUT);
     pinMode(motor_pin_2, OUTPUT);
@@ -103,6 +111,28 @@ void backwardLeft(int speed){
     motorBClockwise(speed/2);
 }
 
+bool isBlack(int sensor){
+    return sensor<500;
+}
+
+void lineFollower(){
+    //speed is from 0 to 255
+    int left_sensor=analogRead(left_sensor_pin);
+    int right_sensor=analogRead(right_sensor_pin);
+    if (!isBlack(left_sensor) && !isBlack(right_sensor)){
+        forward(255);
+    }
+    else if (isBlack(left_sensor) && !isBlack(right_sensor)){
+        turnLeft(255);
+    }
+    else if (!isBlack(left_sensor) && isBlack(right_sensor)){
+        turnRight(255);
+    }
+    else{
+        stop();
+    }
+}
+
 bool isNumber(char c){
     if (((int)c)<48 || ((int)c)>57){
         return 0;
@@ -114,7 +144,7 @@ int num(char c){
     return ((int)c) - 48;
 }
 
-int speed_now=255;
+int speed_now=0;
 void sumo(char command){
     //speed is from 0 to 255
     if (isNumber(command)){
@@ -151,20 +181,32 @@ void sumo(char command){
                 break;
             case 'S':
                 stop();
+           
                 break;
         }
     }
 }
 
-char tmp = 'S';
+char tmp = 'x';
+bool is_X = 0;
 void play(){
     //if you use the robot as sumo robot, call sumo(char $command)
     //if you use the robot as line follower robot, call lineFollower()
     tmp = HC05.read();
-    sumo(tmp);
+    if (tmp=='x'){
+        is_X=0;
+    }
+    if (tmp=='X'){
+        is_X=1;
+    }
+    if (is_X){
+        lineFollower();
+    }
+    else{
+        sumo(tmp);
+    }
 }
 
 void loop(){
-    //play();
-    sumo('F');
+    play();
 }
