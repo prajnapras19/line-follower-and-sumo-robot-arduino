@@ -34,10 +34,6 @@ SoftwareSerial HC05(0,1);
 #define baud_rate 9600
 
 void setup(){
-    //Set pins as inputs
-    pinMode(left_sensor_pin, INPUT);
-    pinMode(right_sensor_pin,INPUT);
-    
     //Set pins as outputs
     pinMode(motor_pin_1, OUTPUT);
     pinMode(motor_pin_2, OUTPUT);
@@ -111,28 +107,6 @@ void backwardLeft(int speed){
     motorBClockwise(speed/2);
 }
 
-bool isBlack(int sensor){
-    return sensor<500;
-}
-
-void lineFollower(){
-    //speed is from 0 to 255
-    int left_sensor=analogRead(left_sensor_pin);
-    int right_sensor=analogRead(right_sensor_pin);
-    if (!isBlack(left_sensor) && !isBlack(right_sensor)){
-        forward(255);
-    }
-    else if (isBlack(left_sensor) && !isBlack(right_sensor)){
-        turnLeft(255);
-    }
-    else if (!isBlack(left_sensor) && isBlack(right_sensor)){
-        turnRight(255);
-    }
-    else{
-        stop();
-    }
-}
-
 bool isNumber(char c){
     if (((int)c)<48 || ((int)c)>57){
         return 0;
@@ -181,30 +155,17 @@ void sumo(char command){
                 break;
             case 'S':
                 stop();
-           
                 break;
         }
     }
 }
 
-char tmp = 'x';
-bool is_X = 0;
+char tmp = 'S';
 void play(){
     //if you use the robot as sumo robot, call sumo(char $command)
     //if you use the robot as line follower robot, call lineFollower()
     tmp = HC05.read();
-    if (tmp=='x'){
-        is_X=0;
-    }
-    if (tmp=='X'){
-        is_X=1;
-    }
-    if (is_X){
-        lineFollower();
-    }
-    else{
-        sumo(tmp);
-    }
+    sumo(tmp);
 }
 
 void loop(){
