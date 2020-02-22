@@ -26,12 +26,8 @@ SoftwareSerial HC05(0,1);
 #define motor_pin_3 10 // Pin  7 of L293
 #define motor_pin_4 9  // Pin  2 of L293
 
-//photosensor IR
-#define left_sensor_pin A0
-#define right_sensor_pin A1
-
 //baud_rate
-#define baud_rate 9600
+#define baud_rate 38400
 
 void setup(){
     //Set pins as outputs
@@ -118,7 +114,7 @@ int num(char c){
     return ((int)c) - 48;
 }
 
-int speed_now=0;
+int speed_now=255;
 void sumo(char command){
     //speed is from 0 to 255
     if (isNumber(command)){
@@ -169,5 +165,6 @@ void play(){
 }
 
 void loop(){
-    play();
+    //play();
+    sumo('F');
 }
